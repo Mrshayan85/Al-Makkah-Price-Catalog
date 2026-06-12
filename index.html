@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Dynamic Web Catalog Generator — Create professional, interactive product catalogs with WhatsApp order integration.">
+  <title>Web Catalog Generator — Admin Panel</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+</head>
+
+<body>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Login UI -->
+  <div id="loginUI" class="login-container">
+    <div class="login-box">
+      <div class="login-header">
+        <div class="login-icon">🔒</div>
+        <h2>Admin Login</h2>
+        <p>Please enter your credentials to access the Web Catalog Generator.</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="loginEmail" class="form-input" required placeholder="admin@shop.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="loginPassword" class="form-input" required placeholder="••••••••">
+        </div>
+        <div id="loginError" class="login-error" style="display:none;">Invalid email or password.</div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 8px;">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- App Container (Hidden by default) -->
+  <div id="appUI" style="display: none;">
+    <div class="app-container">
+
+      <!-- Header -->
+      <header class="app-header">
+        <button id="signOutBtn" class="btn btn-outline"
+          style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; font-size: 12px; border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+          🚪 Sign Out
+        </button>
+        <div class="app-logo">
+          <div class="app-logo-icon">📄</div>
+          <div>
+            <h1 class="app-title">Web Catalog Generator</h1>
+            <p class="app-subtitle">Create & export your interactive web catalog with WhatsApp integration</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Tab Navigation -->
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-btn active" data-tab="tab-products" role="tab" aria-selected="true" id="tabBtnProducts">
+          <span class="tab-icon">📦</span> Products
+        </button>
+        <button class="tab-btn" data-tab="tab-settings" role="tab" aria-selected="false" id="tabBtnSettings">
+          <span class="tab-icon">⚙️</span> Settings
+        </button>
+        <button class="tab-btn" data-tab="tab-preview" role="tab" aria-selected="false" id="tabBtnPreview">
+          <span class="tab-icon">👁️</span> Preview
+        </button>
+      </nav>
+
+      <!-- ========== TAB: PRODUCTS ========== -->
+      <section id="tab-products" class="tab-content active" role="tabpanel">
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-value" id="totalProducts">0</div>
+            <div class="stat-label">Total Products</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="avgWholesale">Rs. 0</div>
+            <div class="stat-label">Avg. Wholesale</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="avgRetail">Rs. 0</div>
+            <div class="stat-label">Avg. Retail</div>
+          </div>
+        </div>
+
+        <!-- Product List -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><span class="icon">📋</span> Product List</h2>
+            <span class="card-badge" id="productCountBadge">Catalog</span>
+          </div>
+
+          <div class="product-table-wrapper">
+            <table class="product-table" id="productTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product Name</th>
+                  <th>Wholesale</th>
+                  <th>Retail</th>
+                  <th>Unit</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Add New Product Form -->
+          <div class="add-product-form" id="addProductForm">
+            <div class="form-group">
+              <label class="form-label" for="newProductName">Product Name</label>
+              <input type="text" class="form-input" id="newProductName" placeholder="e.g. Basmati Rice (5kg)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newWholesalePrice">Wholesale</label>
+              <input type="number" class="form-input" id="newWholesalePrice" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newRetailPrice">Retail</label>
+              <input type="number" class="form-input" id="newRetailPrice" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newProductUnit">Unit</label>
+              <input type="text" class="form-input" id="newProductUnit" placeholder="Pcs">
+            </div>
+            <div class="form-group" style="align-self: end;">
+              <button class="btn btn-success" id="addProductBtn" type="button">
+                ➕ Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate PDF CTA -->
+        <div class="generate-section">
+          <h2 class="generate-title">🌐 Export Your Web Catalog</h2>
+          <p class="generate-subtitle">Generate a standalone, mobile-ready HTML catalog file with a working live cart
+            and WhatsApp checkout.</p>
+
+          <div style="display: flex; gap: 16px; justify-content: center; margin-top: 16px;">
+            <button class="btn-generate" id="generatePdfBtn" type="button" style="flex: 1; max-width: 300px;">
+              <span class="icon">⚡</span> Export Web Catalog
+            </button>
+
+            <input type="file" id="importHtmlFile" accept=".html" style="display: none;">
+            <button class="btn-generate" onclick="document.getElementById('importHtmlFile').click()" type="button"
+              style="flex: 1; max-width: 300px; background: rgba(99, 102, 241, 0.1); box-shadow: none; border: 1px solid rgba(99, 102, 241, 0.3);">
+              <span class="icon">📥</span> Import Existing HTML
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========== TAB: SETTINGS ========== -->
+      <section id="tab-settings" class="tab-content" role="tabpanel">
+
+        <!-- Shop Information -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><span class="icon">🏪</span> Shop Information</h2>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="settingsShopName">Shop Name</label>
+            <input type="text" class="form-input" id="settingsShopName" placeholder="Enter your shop name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="settingsAddress">Shop Address</label>
+            <textarea class="form-textarea" id="settingsAddress" placeholder="Full shop address" rows="2"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="settingsPhone">Phone Number</label>
+              <input type="text" class="form-input" id="settingsPhone" placeholder="+92 300 1234567">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="settingsEmail">Email</label>
+              <input type="email" class="form-input" id="settingsEmail" placeholder="shop@example.com">
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Settings -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><span class="icon">💬</span> WhatsApp Integration</h2>
+          </div>
+
+          <div class="info-banner">
+            <span class="icon">💡</span>
+            <div>
+              <strong>WhatsApp Number Format:</strong> Enter the number in international format <strong>without</strong>
+              the + sign, spaces, or dashes.
+              Example: <code>923001234567</code> for a Pakistani number +92 300 1234567.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="settingsWhatsapp">WhatsApp Number (International Format)</label>
+            <input type="text" class="form-input" id="settingsWhatsapp" placeholder="923001234567">
+          </div>
+        </div>
+
+        <!-- Currency -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><span class="icon">💰</span> Currency</h2>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="settingsCurrency">Currency Symbol</label>
+            <input type="text" class="form-input" id="settingsCurrency" placeholder="Rs.">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex-between mt-24" style="gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-lg" id="saveSettingsBtn" type="button">
+            💾 Save Settings
+          </button>
+          <button class="btn btn-danger" id="resetDataBtn" type="button">
+            🔄 Reset All Data
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ========== TAB: PREVIEW ========== -->
+      <section id="tab-preview" class="tab-content" role="tabpanel">
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><span class="icon">👁️</span> Web Preview</h2>
+            <span class="card-badge">Live Preview</span>
+          </div>
+
+          <div class="info-banner">
+            <span class="icon">ℹ️</span>
+            <div>
+              This is a simplified preview of how your web catalog will look. The exported HTML file will be a
+              responsive, fully functioning web page with a live shopping cart and WhatsApp checkout.
+            </div>
+          </div>
+
+          <div id="pdfPreview">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="info-banner warning">
+          <span class="icon">💡</span>
+          <div>
+            <strong>Hosting:</strong> You can upload the generated `catalog.html` file to a free service like
+            <strong>Netlify Drop</strong> or <strong>Vercel</strong> to instantly get a shareable link for your
+            customers.
+          </div>
+        </div>
+
+        <!-- Generate from Preview -->
+        <div class="generate-section" style="margin-top: 16px;">
+          <button class="btn-generate btn-whatsapp" id="generatePdfBtn2" type="button">
+            <span class="icon">🌐</span> Export & Download HTML
+          </button>
+        </div>
+
+      </section>
+
+      <!-- Footer -->
+      <footer class="developed-by">
+        Developed by <strong>Shayan</strong> — Web Catalog Generator v2.0
+        <br>
+        <div style="text-align: center;">Contact: +923082135452</div>
+      </footer>
+
+    </div>
+
+    <!-- ========== EDIT PRODUCT MODAL ========== -->
+    <div class="modal-overlay hidden" id="editModal">
+      <div class="modal">
+        <h3 class="modal-title">✏️ Edit Product</h3>
+
+        <div class="form-group">
+          <label class="form-label" for="editProductName">Product Name</label>
+          <input type="text" class="form-input" id="editProductName">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="editWholesalePrice">Wholesale Price</label>
+            <input type="number" class="form-input" id="editWholesalePrice" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editRetailPrice">Retail Price</label>
+            <input type="number" class="form-input" id="editRetailPrice" min="0" step="1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editProductUnit">Unit</label>
+          <input type="text" class="form-input" id="editProductUnit">
+        </div>
+
+        <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-outline" id="cancelEditBtn">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveEditBtn">Save Product</button>
+        </div>
+        </form>
+      </div>
+
+    </div> <!-- End App UI Wrapper -->
+
+    <!-- Scripts -->
+    <script src="js/data.js?v=2.0.7"></script>
+    <script src="js/web-generator.js?v=2.0.7"></script>
+    <script src="js/app.js?v=2.0.7"></script>
+
+    <!-- Duplicate generate button handler -->
+    <script>
+      // --- Login Logic ---
+      const HARDCODED_EMAIL = "mrshayan85@gmail.com";
+      const HARDCODED_PASSWORD = "Admin123;";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const loginUI = document.getElementById("loginUI");
+        const appUI = document.getElementById("appUI");
+        const loginForm = document.getElementById("loginForm");
+        const loginError = document.getElementById("loginError");
+
+        if (sessionStorage.getItem("isLoggedIn") === "true") {
+          loginUI.style.display = "none";
+          appUI.style.display = "block";
+        }
+
+        loginForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const email = document.getElementById("loginEmail").value.trim();
+          const password = document.getElementById("loginPassword").value;
+
+          if (email === HARDCODED_EMAIL && password === HARDCODED_PASSWORD) {
+            sessionStorage.setItem("isLoggedIn", "true");
+            loginUI.style.display = "none";
+            appUI.style.display = "block";
+            loginError.style.display = "none";
+          } else {
+            loginError.style.display = "block";
+          }
+        });
+
+        // --- Sign Out Logic ---
+        const signOutBtn = document.getElementById("signOutBtn");
+        if (signOutBtn) {
+          signOutBtn.addEventListener("click", () => {
+            sessionStorage.removeItem("isLoggedIn");
+            appUI.style.display = "none";
+            loginUI.style.display = "flex";
+            document.getElementById("loginEmail").value = "";
+            document.getElementById("loginPassword").value = "";
+          });
+        }
+      });
+
+      // Handle header generate button
+      document.getElementById('headerGenerateBtn')?.addEventListener('click', () => {
+        document.getElementById('generateBtn')?.click();
+      });
+    </script>
+</body>
+
+</html>
